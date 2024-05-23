@@ -16,4 +16,4 @@ https://www.javatpoint.com/data-partitioning-in-pyspark
 
 https://www.examtopics.com/
 
-pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip pandas
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip <specifylibraryname>
