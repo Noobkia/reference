@@ -17,3 +17,51 @@ https://www.javatpoint.com/data-partitioning-in-pyspark
 https://www.examtopics.com/
 
 pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip <specifylibraryname>
+
+SELECT TOP(10) PERCENT * --to get n percent
+FROM dbo.uUser
+ORDER BY NEWID()--for random selection
+ 
+random percent selection
+
+
+DECLARE @StartYear INT = YEAR(GETDATE()) - 2 -- 2 years rolling window
+DECLARE @StartMonth INT = 1
+DECLARE @EndYear INT = YEAR(GETDATE())
+DECLARE @EndMonth INT = MONTH(GETDATE())
+ 
+SELECT *
+FROM (
+   SELECT acc_Year, b.MainTypeDesc, SUM(policy_cnt) AS cert_cnt
+   FROM [GISTakafulDMart].[dbo].[MT_Prod_Fact] A
+   LEFT JOIN DIM_CLASS_TYPE_SDF B ON A.Class_Code = B.MainTypeCode
+   WHERE acc_Year BETWEEN @StartYear AND @EndYear
+   AND (
+       (acc_Year = @StartYear AND acc_Mth >= @StartMonth)
+       OR (acc_Year > @StartYear)
+   )
+   AND (
+       (acc_Year = @EndYear AND acc_Mth <= @EndMonth)
+       OR (acc_Year < @EndYear)
+   )
+   AND Policy_Cnt = 1
+   GROUP BY acc_Year, b.MainTypeDesc
+ 
+   UNION
+ 
+   SELECT acc_Year, b.MainTypeDesc, SUM(policy_cnt) AS cert_cnt
+   FROM [GISTakafulDMart].[dbo].[NMTProd_Fact] A
+   LEFT JOIN DIM_CLASS_TYPE_SDF B ON A.Class_Code = B.MainTypeCode
+   WHERE acc_Year BETWEEN @StartYear AND @EndYear
+   AND (
+       (acc_Year = @StartYear AND acc_Mth >= @StartMonth)
+       OR (acc_Year > @StartYear)
+   )
+   AND (
+       (acc_Year = @EndYear AND acc_Mth <= @EndMonth)
+       OR (acc_Year < @EndYear)
+   )
+   AND Policy_Cnt = 1
+   GROUP BY acc_Year, b.MainTypeDesc
+) x
+ORDER BY x.Acc_Year, x.MainTypeDesc
